@@ -52,9 +52,16 @@ def register():
 @auth_bp.route('/dashboard')
 def dashboard():
     if 'user_id' in session:
-        return render_template('dashboard.html')
+        user_id = session['user_id']
+        conn = sqlite3.connect('db/clerq.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT email FROM users WHERE id = ?", (user_id,))
+        user = cursor.fetchone()
+        conn.close()
+        return render_template('dashboard.html', email=user[0])
     else:
         return redirect(url_for('auth_bp.login'))
+
 
 @auth_bp.route('/logout')
 def logout():       
